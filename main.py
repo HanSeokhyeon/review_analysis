@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from ch2.inference import inference_json
 from ch3.inference import inference_function_calling
 from ch4.inference import inference_langchain
+from ch5.inference import inference_all_langchain
 
 app = FastAPI()
 
@@ -31,3 +32,18 @@ class RequestBody2(BaseModel):
 @app.post("/summary")
 async def summarize_review(body: RequestBody2 = Body()):
     return inference_langchain(body.reviews)
+
+
+class Review(BaseModel):
+    id: int
+    document: str
+
+
+class RequestBody3(BaseModel):
+    reviews: List[Review]
+
+
+@app.post("/analysis")
+async def analyze_reviews(body: RequestBody3 = Body()):
+    reviews = [review.dict() for review in body.reviews]
+    return inference_all_langchain(reviews)
